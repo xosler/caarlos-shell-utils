@@ -11,8 +11,8 @@
 #vars
 PROJECT_FOLDER=~/workspace/Detran/
 JETTY_HOME=~/software/jetty-hightide-8.0.4.v20111024/
-WAR_BASE=projeto*.war
-WAR_DEST=Projeto.war
+WAR_BASE=detran*.war
+WAR_DEST=Detran.war
 BUILD_APPLET=0
 BUILD_WAR=0
 START_SERVER=0
