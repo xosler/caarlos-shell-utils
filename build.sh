@@ -9,21 +9,60 @@
 #
 
 #vars
-PROJECT_FOLDER=~/workspace/Detran/
+DETRAN_PROJECT=~/workspace/Detran/
 JETTY_HOME=~/software/jetty-hightide-8.0.4.v20111024/
-WAR_BASE=detran*.war
-WAR_DEST=Detran.war
 BUILD_APPLET=0
 BUILD_WAR=0
 START_SERVER=0
+CLEAN=0
 
+function clean() {
+    echo "::clean"
+    rm -rf Detran.war
+    rm -rf dtran*.war
+    rm -rf build/
+    rm -rf gwt-unitCache/
+    rm -rf war/server_resources/
+    rm -rf war/WEB-INF/deploy/
+    rm -rf war/Detran/
+    rm -rf apt_generated/*
+}
+
+function buildApplets() {
+    echo "::buildApplets"
+    for i in $(ls build*.xml | grep -v build.xml); do
+        ant -f $i deploy
+    done
+}
+
+function buildWar() {
+    echo ":: buildWar"
+    ant -f build.xml
+
+    # renomeia para Detran.war
+    ls detran*.war
+}
+
+
+function startServer() {
+    echo "::startServer"
+    # move o war para a pasta webapps do jetty
+    mv detran*.war Detran.war
+    
+    mv Detran.war $JETTY_HOME/webapps/
+    
+    # copia o detran.properties com -force
+    # cp war/detran.properties $JETTY_HOME -f nao é mais necessario!
+    
+    cd $JETTY_HOME
+    java -jar start.jar
+}
 
 # entra na pasta do projeto
-cd $PROJECT_FOLDER
+cd $DETRAN_PROJECT
 
 if [ $# -eq 0 ]; then
-    echo "Informe uma ou mais opcoes: applet, war, server ou all"
-    exit 0
+    echo "Informe uma ou mais opcoes: applet, war, server, clean ou all"
 fi
 
 for param in $*; do
@@ -31,41 +70,35 @@ for param in $*; do
         applet) BUILD_APPLET=1 ;;
         war)  BUILD_WAR=1 ;;
         server) START_SERVER=1 ;;
-        all) START_SERVER=1; BUILD_WAR=1; BUILD_APPLET=1 ;;
+        clean) CLEAN=1 ;;
+        all) START_SERVER=1; BUILD_WAR=1; BUILD_APPLET=1; CLEAN=1 ;;
     esac
 done
 
 # apaga os lixos antigos, se eles existirem, claro
-rm -rf $WAR_DEST
-rm -rf $WAR_BASE
+if [ $CLEAN -eq 1 ]; then
+	clean
+fi
 
 # compila todos os builds xml, menos o build.xml,
 # porque ele pode acabar compilando o build antes dos
 # builds dos applets, daí vai desatualizado as coisas.
 if [ $BUILD_APPLET -eq 1 ]; then
-    for i in $(ls build*.xml | grep -v build.xml); do
-        ant -f $i
-    done
+    buildApplets
 fi
 
 # constroi o war da app
 if [ $BUILD_WAR -eq 1 ]; then
-    ant -f build.xml
-
-    # renomeia para $WAR_DEST
-    ls $WAR_BASE
-    mv $WAR_BASE $WAR_DEST
-
+    buildWar
 fi
 
+if [ $CLEAN -eq 1 ]; then
+	clean
+fi
 
 # entra na pasta do jetty e executa ele :)
 if [ $START_SERVER -eq 1 ]; then
-    # move o war para a pasta webapps do jetty
-    mv $WAR_DEST $JETTY_HOME/webapps/
-
-    cd $JETTY_HOME
-    java -jar start.jar
+   startServer 
 fi
 
-exit 0
+
