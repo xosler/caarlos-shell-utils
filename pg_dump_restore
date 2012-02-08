@@ -1,0 +1,8 @@
+#
+# DUMP e RESTORE de databases postgresql
+#
+#
+
+#dump
+pg_dump -f ARQUIVO.db -F p -U USUARIO BASE
+pg_restore -d BASE -U USUARIO ARQUIVO.db
