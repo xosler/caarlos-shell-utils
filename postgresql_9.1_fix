@@ -1,0 +1,12 @@
+#
+# these commands hack the bug of newer postgresql versions, and with this you can use it without read a 
+# pg_restore: error while loading shared libraries: liblber-2.3.so.0: cannot open shared object file: Error 40
+# error.
+#
+#
+# related: http://www.postgresql.org.es/node/694
+#
+
+cp /opt/PostgreSQL/9.1/lib/liblber-2.3.so.0 /usr/lib/liblber-2.3.so.0
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/PostgreSQL/9.1/lib/
+
