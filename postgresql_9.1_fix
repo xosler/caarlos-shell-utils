@@ -8,5 +8,7 @@
 #
 
 cp /opt/PostgreSQL/9.1/lib/liblber-2.3.so.0 /usr/lib/liblber-2.3.so.0
+
+# you may want put this in you bashrc file :)
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/PostgreSQL/9.1/lib/
 
